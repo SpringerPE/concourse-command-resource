@@ -45,7 +45,7 @@ resources:
     uri: git@github.com:springerpe/repository.git
     branch: master
     private_key: {{github-private-key}}
-- name: run
+- name: run_ls
   type: command
   source:
     command: ls
@@ -54,8 +54,14 @@ jobs:
 - name: run-command
   plan:
   - get: source
-  - put: run
+  - put: run_ls
     params:
       args: "-la"
 ```
+
+# Author
+
+Jose Riguera <jose.riguera@springernature.com>
+
+(c) 2017 Springer Nature Platform Engineering
 
