@@ -1,0 +1,42 @@
+---
+resources:
+- name: repository-concourse-command-resource
+  type: git
+  source:
+    uri: https://github.com/SpringerPE/concourse-command-resource.git
+    branch: master
+
+- name: task-docker-image
+  type: docker-image
+  source:
+    email: {{docker-hub-email}}
+    username: {{docker-hub-username}}
+    password: {{docker-hub-password}}
+    repository: platformengineering/concourse-command-resource
+
+jobs:
+- name: job-build-task-docker-image
+  public: true
+  serial: true
+  plan:
+  - get: repository-concourse-command-resource
+    trigger: true
+  - put: task-docker-image
+    params:
+      build: repository-concourse-command-resource
+
+
+- name: job-test-task-docker-image
+  public: true
+  serial: true
+  plan:
+  - aggregate:
+    - get: task-docker-image
+      passed: [job-build-task-docker-image]
+      trigger: true
+    - get: src
+      resource: repository-concourse-command-resource
+      trigger: false
+  - task: test-run
+    file: src/ci/tasks/test.yml
+
